@@ -5,10 +5,8 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint ./",
-    "start": "forever index.js",
-    "admin": "node administrator_dashboard.js",
-    "pull": "git pull && npm install",
-    "test": "node ."
+    "start": "node .",
+    "pull": "git pull && npm install"
   },
   "keywords": [],
   "author": "SubsurfaceStudios",

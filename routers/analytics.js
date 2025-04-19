@@ -6,7 +6,9 @@ const { readFileSync } = require('node:fs');
 const RSA = require('node-rsa');
 const cfg = require('../config.json');
 
-const EXCEPTION_LOGGING_PUBLIC_KEY = new RSA().importKey(readFileSync(cfg.exception_logging_publickey_path).toString('utf-8'), cfg.exception_logging_publickey_format);
+const EXCEPTION_LOGGING_PUBLIC_KEY = cfg.exception_logging_publickey_path !== undefined
+    ? new RSA().importKey(readFileSync(cfg.exception_logging_publickey_path).toString('utf-8'), cfg.exception_logging_publickey_format)
+    : null;
 
 router.get("/account-count", async (req, res) => {
     const {mongoClient} = require('../index');
@@ -26,10 +28,17 @@ router.get("/instance-count", async (req, res) => {
 });
 
 router.put("/exception-report", authenticateToken, async (req, res) => {
+    if (!EXCEPTION_LOGGING_PUBLIC_KEY) {
+        return res.status(503).json({
+            code: "reporting_unavailable",
+            message: "Exception reporting is not available on this server."
+        });
+    }
+
     let data = await PullPlayerData(req.user.id);
     if (data.settings.ALLOW_EXCEPTION_REPORTING !== "PERMIT") {
         res
-            .setHeader("Link", "https://api.compensationvr.tk; rel=\"blocked-by\"")
+            .setHeader("Link", `${cfg.base_url}; rel="blocked-by"`)
             .status(451)
             .json({
                 code: "denied_for_privacy_reasons",
@@ -65,7 +74,7 @@ router.put("/exception-report", authenticateToken, async (req, res) => {
     } catch (ex) {
         res.status(500).json({
             code: "internal_error",
-            message: "An internal server error occurred and we were unable to serve your request. Please contact the API team at your next convenience."
+            message: "An internal server error occurred and we were unable to serve your request. Please contact the server admin at your next convenience."
         });
         throw ex;
     }

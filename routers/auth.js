@@ -11,12 +11,14 @@ const {default: rateLimit} = require('express-rate-limit');
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
-const client = require('twilio')(accountSid, authToken);
+const client = (accountSid !== undefined && authToken !== undefined)
+    ? require('twilio')(accountSid, authToken)
+    : null;
 
-// Users can now only create 1 account per day.
+// Users can only create `max` accounts per `windowMs`.
 const accountCreationLimit = rateLimit({
-    'windowMs': 86400000,
-    'max': 1,
+    'windowMs': config.ratelimit_registration_window,
+    'max': config.ratelimit_registration_max,
     'legacyHeaders': true,
     'standardHeaders': true
 });
@@ -48,6 +50,8 @@ router.get('/photon-info', async (req, res) => {
 });
 
 router.post('/enable-2fa', middleware.authenticateToken, async (req, res) => {
+    if (!client) return res.status(503).send("MFA is not available on this server.");
+
     try {
         const data = await helpers.PullPlayerData(req.user.id);
         if(data.auth.mfa_enabled || data.auth.mfa_enabled === "unverified") return res.status(400).send("Two factor authentication is already enabled on this account!");
@@ -73,6 +77,8 @@ router.post('/enable-2fa', middleware.authenticateToken, async (req, res) => {
 });
 
 router.post('/verify-2fa', middleware.authenticateToken, async (req, res) => {
+    if (!client) return res.status(503).send("MFA is not available on this server.");
+
     var {code} = req.body;
     if(typeof code != 'string') return res.status(400).send("Your 2FA code is undefined or is not a string. Check your Content-Type header and request body.");
 
@@ -109,6 +115,8 @@ router.post("/login", async (req, res) => {
     //and if those are correct we generate a token
 
     const { username, password, two_factor_code, hwid} = req.body;
+
+    if (two_factor_code !== undefined) return res.status(400).send({message: "2FA is not supported on this server."});
 
     const userID = await helpers.getUserID(username);
     if(userID === null) return res.status(404).send({message: "User not found!", failureCode: "5"});
@@ -389,7 +397,7 @@ router.get("/password-update", middleware.authenticateDeveloperToken, async (req
         if(data.auth.mfa_enabled) 
             return res.status(400).json({
                 code: "access_denied",
-                message: "The password of accounts with Multi-Factor Authentication cannot be changed. Support will not be able to assist you.\nStaff may be able to recieve exemptions, if you are a staff member locked out of your account please contact the development team directly."
+                message: "The password of accounts with Multi-Factor Authentication cannot be changed. Support will not be able to assist you.\nStaff may be able to recieve exemptions, if you are a staff member locked out of your account please contact the server admin directly."
             });
 
         if(!bcrypt.compareSync(current_password, data.auth.HASHED_PASSWORD))

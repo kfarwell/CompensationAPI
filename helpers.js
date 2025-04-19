@@ -284,8 +284,12 @@ async function getAccountCount() {
  * @param {Boolean} isRaw Whether or not to wrap the text in a code block for Discord webhooks.
  */
 function auditLog(message, isRaw) {
-    const file = fs.readFileSync("./data/audit.json");
-    let data = JSON.parse(file);
+    let data = [];
+    try {
+        data = JSON.parse(fs.readFileSync("./data/audit.json"));
+    } catch {
+        data = [];
+    }
 
     const ts = Date.now();
 

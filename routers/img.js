@@ -133,7 +133,7 @@ router.post("/upload", uploadRateLimit, middleware.authenticateToken, async (req
         });
         file.end(buff);
 
-        helpers.auditLog(`Image with ID ${MetaData._id} has been uploaded to the API. Moderator intervention advised to ensure SFW.\nPERMALINK:\nhttps://api.compensationvr.tk/img/${MetaData._id}`, true);
+        helpers.auditLog(`Image with ID ${MetaData._id} has been uploaded to the API. Moderator intervention advised to ensure SFW.\nPERMALINK:\n${config.base_url}/img/${MetaData._id}`, true);
 
         // Finalize request
         res.status(200).send("Successfully uploaded image.");
@@ -164,7 +164,7 @@ router.get('/:id/embed', (req, res) => {
      <meta content="Taken by ###nick### (@###user###) on ###time### ###tags###" property="og:description">
      <meta name="theme-color" content="#9702f4">
      <meta content="summary_large_image" name="twitter:card">
-     <meta http-equiv="refresh" content="0; URL=https://api.compensationvr.tk/img/${id}">
+     <meta http-equiv="refresh" content="0; URL=${config.base_url}/img/${id}">
      </head>
      </html>`;
 
@@ -180,7 +180,7 @@ router.get('/:id/embed', (req, res) => {
             '###user###': doc.takenBy.username,
             '###time###': doc.takenOn.humanReadable,
             '###tags###': doc.social.tags.map(e => '#' + e).join(' '),
-            '###img###': 'https://api.compensationvr.tk/img/' + id
+            '###img###': `${config.base_url}/img/${id}`
         })) {
             // escape html to prevent xss
             replacement = replacement.replace(/&/g, "&amp;")

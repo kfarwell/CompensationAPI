@@ -13,7 +13,7 @@ router.get("/all", authenticateToken, async (req, res) => {
     } catch (ex) {
         res.status(500).json({
             code: "internal_server_error",
-            message: "An internal server error occurred and we were unable to process your request. Please try again later or contact the API team."
+            message: "An internal server error occurred and we were unable to process your request. Please try again later or contact the server admin."
         });
     } 
 });
@@ -43,7 +43,7 @@ router.post("/:setting/set", authenticateToken, async (req, res) => {
     } catch (ex) {
         res.status(500).json({
             code: "internal_server_error",
-            message: "An internal server error occurred and we were unable to process your request. Please try again later or contact the API team."
+            message: "An internal server error occurred and we were unable to process your request. Please try again later or contact the server admin."
         });
     }
 });
@@ -73,7 +73,7 @@ router.post("/flush", authenticateToken, async (req, res) => {
     } catch (ex) {
         res.status(500).json({
             code: "internal_server_error",
-            message: "An internal server error occurred and we were unable to process your request. Please try again later or contact the API team."
+            message: "An internal server error occurred and we were unable to process your request. Please try again later or contact the server admin."
         });   
     }
 });

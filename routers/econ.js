@@ -53,7 +53,7 @@ router.post("/item/buy", middleware.authenticateToken, async (req, res) => {
         await ModifyPlayerCurrency(req.user.id, 0 - item.buy_price);
         return res.status(200).send("Successfully purchased item! Enjoy!");
     } catch (ex) {
-        res.status(500).send("Failed to purchase item due to an internal server error. Please contact Rose932#1454 on Discord for more information.");
+        res.status(500).send("Failed to purchase item due to an internal server error. Please contact the server admin for more information.");
         throw ex;
     }
 });
@@ -80,7 +80,7 @@ router.post("/item/gift", middleware.authenticateToken, async (req, res) => {
         await ModifyPlayerCurrency(req.user.id, 0 - item.gift_price);
         return res.status(200).send("Gift successfully sent! Thanks for playing Compensation VR!");
     } catch (ex) {
-        res.status(500).send("Internal server error, failed to send gift. Contact Rose932#1454 on Discord for more information.");
+        res.status(500).send("Internal server error, failed to send gift. Contact the server admin for more information.");
         throw ex;
     }
 });
@@ -101,7 +101,7 @@ router.post("/item/refund", middleware.authenticateToken, async (req, res) => {
         await SubtractPlayerItem(req.user.id, item_id);
         return res.status(200).send("Transaction complete. Thank you for playing Compensation VR!");
     } catch (ex) {
-        res.status(500).send("An error occurred and we failed to complete the transaction. Please contact Rose932#1454 on Discord for more information.");
+        res.status(500).send("An error occurred and we failed to complete the transaction. Please contact the server admin for more information.");
         throw ex;
     }
 });
@@ -127,7 +127,7 @@ router.post("/item/transfer", middleware.authenticateToken, async (req, res) => 
         await SubtractPlayerItem(req.user.id, item_id);
         return res.status(200).send("Item transferred. Thanks for playing Compensation VR!");
     } catch (ex) {
-        res.status(500).send("We encountered an error and the transaction could not be completed. Please contact Rose932#1454 on Discord for more information.");
+        res.status(500).send("We encountered an error and the transaction could not be completed. Please contact the server admin for more information.");
         throw ex;
     }
 });
@@ -149,7 +149,7 @@ router.post("/currency/transfer", middleware.authenticateToken, async (req, res)
         await ModifyPlayerCurrency(target, amount);
         return res.status(200).send("Currency successfully transferred! Thanks for playing Compensation VR!");
     } catch (ex) {
-        res.status(500).send("An error occured and we couldn't transfer the currency. Please contact Rose932#1454 on Discord for more information.");
+        res.status(500).send("An error occured and we couldn't transfer the currency. Please contact the server admin for more information.");
         throw ex;
     }
 });
@@ -209,7 +209,7 @@ router.get("/items/featured", async (req, res) => {
         if (data == null || !Array.isArray(data?.data))
             return res.status(404).json({
                 code: "misconfiguration",
-                message: "An internal misconfiguration has occurred and we cannot serve the request. Please contact the development team ASAP to resolve the issue."
+                message: "An internal misconfiguration has occurred and we cannot serve the request. Please contact the server admin ASAP to resolve the issue."
             });
 
         res.status(200).json(data.data);

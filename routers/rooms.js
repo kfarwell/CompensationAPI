@@ -434,7 +434,7 @@ router.post('/room/:id/subrooms/:subroom_id/versions/public', authenticateToken,
     } catch (ex) {
         res.status(500).json({
             "code": "internal_error",
-            "message": "An internal error occured while processing your request. If the issue persists, please contact CVR staff."
+            "message": "An internal error occured while processing your request. If the issue persists, please contact the server admin."
         });
         throw ex;
     }
@@ -586,7 +586,7 @@ router.post('/room/:id/moderation-suspend', authenticateDeveloperToken, async (r
                     "userPermissions": {},
                     "rolePermissions.everyone.viewAndJoin": false,
                     "rolePermissions.everyone.managePermissions": false,
-                    "description": "This room has been suspended by the Compensation Social moderation team for possible violations of our community standards. Please see https://compensationvr.tk/about/suspension for more information.",
+                    "description": "This room has been suspended by the Compensation server moderation team for possible violations of our community standards.",
                 }
             }
         );
@@ -622,10 +622,7 @@ router.post('/room/:id/moderation-suspend', authenticateDeveloperToken, async (r
                         template: "room_suspension_notice",
                         parameters: {
                             "headerText": "<smallcaps><color=red>Urgent Moderation Notice",
-                            "bodyText": `We regret to inform you that your room <noparse>"${roomname}"</noparse> has been <color=yellow>suspended</color> by the Compensation Social moderation team.
-
-For more information, please see
-<color=#FF5566>https://compensationvr.tk/about/suspension</color>`
+                            "bodyText": `We regret to inform you that your room <noparse>"${roomname}"</noparse> has been <color=yellow>suspended</color> by the Compensation server moderation team.`
                         }
                     }
                 }
@@ -712,7 +709,7 @@ router.post("/room/:id/moderation-terminate", authenticateDeveloperToken, async 
                     "rolePermissions": {
                         "everyone": {},
                     },
-                    "description": "This room has been terminated by the Compensation Social moderation team for repeated violations of our community standards. Please see https://compensationvr.tk/about/termination for more information.",
+                    "description": "This room has been terminated by the Compensation server moderation team for repeated violations of our community standards.",
                 }
             }
         );
@@ -748,12 +745,7 @@ router.post("/room/:id/moderation-terminate", authenticateDeveloperToken, async 
                         template: "room_termination_notice",
                         parameters: {
                             "headerText": "<smallcaps><color=red>Urgent Moderation Notice",
-                            "bodyText": `We regret to inform you that your room <noparse>"${roomname}"</noparse> has been <color=#FF5566>Terminated</color> by the Compensation Social moderation team.
-
-For more information, please see
-<color=#FF5566>https://compensationvr.tk/about/terminated</color>
-
-You can appeal this decision on our Discord, the link is available at the page above.`
+                            "bodyText": `We regret to inform you that your room <noparse>"${roomname}"</noparse> has been <color=#FF5566>Terminated</color> by the Compensation server moderation team.`
                         }
                     }
                 }
@@ -1091,7 +1083,7 @@ router.post('/new', authenticateToken, async (req, res) => {
                                 }
                             },
                             shortHandCommitMessage: "Initial Commit",
-                            longHandCommitMessage: "Initial Commit - Auto-Generated for your convenience by the Compensation VR API.",
+                            longHandCommitMessage: "Initial Commit - Auto-Generated for your convenience.",
                             author: req.user.id,
                             collaborators: [],
                             associated_file: false
@@ -1676,7 +1668,7 @@ router.post("/room/:id/subrooms/:name/create", authenticateToken, requiresRoomPe
                         }
                     },
                     shortHandCommitMessage: "Initial Commit",
-                    longHandCommitMessage: "Initial Commit - Auto-Generated for your convenience by the Compensation Social API.",
+                    longHandCommitMessage: "Initial Commit - Auto-Generated for your convenience.",
                     author: req.user.id,
                     collaborators: [],
                     associated_file: false

@@ -33,6 +33,13 @@ app.use(fileUpload({
 
 const config = require('./config.json');
 
+app.use((req, res, next) => {
+    if (config.debug_log_requests) {
+        helpers.auditLog(`HTTP ${req.method} ${req.originalUrl}\n`, false);
+    }
+    next();
+});
+
 //#region routers
 
 // /api/accounts/*
@@ -84,13 +91,14 @@ app.get("/api/versioncheck/:platform/:version_id", async (req, res) => {
     if(conf == null) {
         res.status(500).json({
             "code": "internal_error",
-            "message": "The server is misconfigured and cannot serve your request. Please contact the Compensation VR support team.",
+            "message": "The server is misconfigured and cannot serve your request. Please contact the Compensation server admin.",
             "allowed": false
         });
         throw new Error("The version check config has not been set!");
     }
 
     if(!Object.keys(conf.allowed_versions).includes(platform)) {
+        helpers.auditLog(`Failed version check ${platform}/${version_id}\n`, false);
         return res.status(200).json({
             "code": "success",
             "message": "This version is not permitted.",
@@ -124,6 +132,33 @@ const client = new MongoClient(uri, {
     useUnifiedTopology: true
 });
 
+async function seedDatabase(client) {
+    const db = client.db(process.env.MONGOOSE_DATABASE_NAME);
+
+    const collections = ["accounts", "channels", "configuration", "global", "rooms", "servers"];
+    for (const collection of collections) {
+        const count = await db.collection(collection).estimatedDocumentCount();
+        if (count === 0) {
+            const data = require(`./seed/${collection}.json`);
+            if (Array.isArray(data)) {
+                await db.collection(collection).insertMany(data);
+                console.log(`Seeded ${collection}.`);
+            }
+        }
+    }
+
+    const photonData = await db.collection("configuration").findOne({ _id: "PhotonData" });
+    const set = {};
+    if (photonData?.data.AppIdRealtime !== config.photon_appid_realtime)
+        set["data.AppIdRealtime"] = config.photon_appid_realtime;
+    if (photonData?.data.AppIdVoice !== config.photon_appid_voice)
+        set["data.AppIdVoice"] = config.photon_appid_voice;
+    if (Object.keys(set).length > 0) {
+        await db.collection("configuration").updateOne({ _id: "PhotonData" }, { $set: set });
+        console.log(`Updated Photon configuration.`);
+    }
+}
+
 client.connect().then(async (client) => {
     if (!client) {
         console.error(`Failed to connect to MongoDB - fatal\n`);
@@ -132,6 +167,8 @@ client.connect().then(async (client) => {
     }
     
     console.log("MongoDB Connection Established.");
+
+    await seedDatabase(client);
     
     require('firebase/app').initializeApp(require('./env').firebaseConfig);
     

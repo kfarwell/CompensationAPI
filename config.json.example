@@ -1,0 +1,17 @@
+{
+    "PORT": 8287,
+    "base_url": "https://api.example.com",
+    "firebase_bucket_url": "example.firebasestorage.app",
+    "photon_appid_realtime": "00000000-0000-0000-0000-000000000000",
+    "photon_appid_voice": "00000000-0000-0000-0000-000000000000",
+    "max_image_size": "10mb",
+    "disable_image_upload": false,
+    "disable_image_fetch": false,
+    "disable_image_caching": false,
+    "timeout_at_report_count": 2,
+    "max_logged_logins": 10,
+    "ratelimit_registration_window": 86400000,
+    "ratelimit_registration_max": 5,
+    "debug_log_requests": true,
+    "debug_trace_instances": true
+}

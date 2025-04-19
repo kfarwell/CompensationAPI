@@ -168,7 +168,7 @@ router.post("/bio", middleware.authenticateToken, async (req, res) => {
     var data = await helpers.PullPlayerData(req.user.id);
 
     if(regex.test(bio)) {
-        helpers.auditLog(`Suspicious nickname change! ${req.user.id} attempted to change nickname to ${bio}. Request permitted, but please review it.`);
+       helpers.auditLog(`Suspicious bio change! ${req.user.id} attempted to change bio to ${bio}. Request permitted, but please review it.`);
     }
 
     if(bio.length > 3000) return res.status(400).send("Bio is too long!");
@@ -235,7 +235,7 @@ router.post("/report", middleware.authenticateToken, async (req, res) => {
 
     helpers.auditLog(`!MODERATION! User ${req.user.id} filed a report against user ${target} for the reason of ${reason}`, false);
      
-    res.status(200).send("Report successfully applied. Thank you for helping keep Compensation VR safe.");
+    res.status(200).send("Report successfully applied. Thank you for helping keep our community safe.");
     await helpers.onPlayerReportedCallback(report);
 });
 
