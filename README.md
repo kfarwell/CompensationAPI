@@ -9,7 +9,6 @@ Best of luck, and we hope you enjoy Compensation Social!
 * NodeJS
 * MongoDB server
 * Firebase web app, bucket, service account, and user account
-  * Upload a CVR room to `rooms/4b7d3810-be88-11ec-b306-43a037ec5b07/subrooms/home/versions/0.bin`
 * Photon Cloud Voice and Realtime apps
 
 # Setup

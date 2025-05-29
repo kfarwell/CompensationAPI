@@ -207,7 +207,7 @@ router.get("/search", authenticateToken_optional, async (req, res) => {
 
         return res.status(200).json(searchResults.map(item => item.item));
     case "originals":
-        return res.status(200).json(results.filter(room => room.creator_id === "16"));
+        return res.status(200).json(results.filter(room => room.creator_id === "0"));
     case "most-visited":
         return res.status(200).json(results);
     case "mine":
