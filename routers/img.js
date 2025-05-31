@@ -76,7 +76,7 @@ router.post("/upload", uploadRateLimit, middleware.authenticateToken, async (req
     if(config.disable_image_upload && !req.user.developer) return res.status(409).send({"message": "Access denied - image uploads have been disabled by the system administrator.", "code": "uploads_disabled"});
     try {
         var {others, room_id, tags} = req.query;
-        if(req.headers['content-type'] !== 'text/plain' || typeof req.body == 'undefined') return res.status(400).send("You did not send encoded photo data.");
+        if(!req.headers['content-type'].startsWith('text/plain') || typeof req.body == 'undefined') return res.status(400).send("You did not send encoded photo data.");
         if(typeof room_id != 'string') return res.status(400).send("Room ID not specified.");
         if(typeof others != 'string') others = '[]';
         if(typeof tags != 'string' || !(JSON.parse(tags) instanceof Array)) tags = '[ "photo" ]';
