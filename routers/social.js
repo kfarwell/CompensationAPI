@@ -51,7 +51,7 @@ router.get("/imgfeed", middleware.authenticateToken_optional, async (req, res) =
             return res.status(400).send({code: "cannot_parse_offset"});
         }
 
-        if(image_count < (count + offset)) count = (image_count - offset) - 1;
+        if(image_count < (count + offset)) count = Math.max(0, image_count - offset);
 
         var feed = [];
         if(typeof reverse != 'undefined' && reverse != "false") {
