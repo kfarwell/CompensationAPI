@@ -114,8 +114,8 @@ router.route("/room/:room_id/info")
     });
 
 const download_limit = rateLimit({
-    'windowMs': 60 * 10 * 1000,
-    'max': 10
+    'windowMs': 60 * 60 * 1000,
+    'max': 60
 });
 
 router.route("/room/:room_id/subrooms/:subroom_id/versions/:version_id/download")
