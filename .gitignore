@@ -1,12 +1,14 @@
 node_modules
+config.jsonc
+data/audit.json
+keys/
+
+# Superseded by config.jsonc, but still present on existing deployments
+# until their secrets are migrated. Never commit these.
 .env
 config.json
-src
-env.js
-nginx.conf
-data/audit.json
 admin.json
-keys/
+env.js
 
 # IDE stuff
 .vscode/*
