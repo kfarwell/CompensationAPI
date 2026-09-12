@@ -315,11 +315,36 @@ router.post("/refresh", middleware.authenticateToken, async (req, res) => {
 
 //Call to create an account from a set of credentials.
 router.post("/create", accountCreationLimit, async (req, res) => {
-    var { username, nickname, password } = req.body;
+    var { username, nickname, password, 'cf-turnstile-response': turnstileToken } = req.body;
     const id = `${await helpers.getAccountCount() + 1}`;
 
     if(typeof username != 'string' || typeof password != 'string') return res.status(400).send("Username or password empty or null.");
     if(typeof nickname != 'string') nickname = username;
+
+    if (process.env.TURNSTILE_SECRET_KEY) {
+        if (!turnstileToken) {
+            return res.status(400).send("Captcha verification missing.");
+        }
+
+        try {
+            const verifyResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `secret=${encodeURIComponent(process.env.TURNSTILE_SECRET_KEY)}&response=${encodeURIComponent(turnstileToken)}&remoteip=${encodeURIComponent(req.ip)}`
+            });
+
+            const verifyData = await verifyResponse.json();
+
+            if (!verifyData.success) {
+                return res.status(400).send("Captcha verification failed.");
+            }
+        } catch (error) {
+            helpers.auditLog(`Turnstile verification error: ${error.message}`, false);
+            return res.status(500).send("Captcha verification error.");
+        }
+    }
 
     const dupe = await helpers.getUserID(username);
 

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Compensation</title>
+    <meta charset="utf-8">
+    <link rel="icon" href="img/2.png" type="image/png" />
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+    <h1>Register account</h1>
+    <form id="register">
+        <p>
+            <label for="username">Username</label><br>
+            <input type="text" id="username" name="username" required>
+        </p>
+        <p>
+            <label for="password">Password</label><br>
+            <input type="password" id="password" name="password" required>
+        </p>
+        <p>
+            <label for="nickname">Nickname</label><br>
+            <input type="text" id="nickname" name="nickname" required>
+        </p>
+        <p>
+            <label for="age">Age</label><br>
+            <input type="number" id="age" name="age" min="13" required>
+        </p>
+        <div class="cf-turnstile" data-sitekey="TURNSTILE_SITE_KEY" data-theme="light"></div>
+        <p>
+            <button type="submit">Register</button>
+        </p>
+    </form>
+    <p id="message"></p>
+
+    <script>
+        document.getElementById('register').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                username: document.getElementById('username').value,
+                password: document.getElementById('password').value,
+                nickname: document.getElementById('nickname').value,
+                age: document.getElementById('age').value
+            };
+            
+            const turnstileWidget = document.querySelector('[name="cf-turnstile-response"]');
+            if (turnstileWidget) {
+                const turnstileResponse = turnstileWidget.value;
+                if (!turnstileResponse) {
+                    document.getElementById('message').innerHTML = 'Are you a robot?';
+                    document.getElementById('message').style.color = 'red';
+                    return;
+                }
+                formData['cf-turnstile-response'] = turnstileResponse;
+            }
+            
+            try {
+                const response = await fetch('/api/auth/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const messageDiv = document.getElementById('message');
+                if (response.ok) {
+                    messageDiv.innerHTML = 'Account registered successfully.';
+                    messageDiv.style.color = 'green';
+                    document.getElementById('register').reset();
+                } else {
+                    const errorText = await response.text();
+                    messageDiv.innerHTML = 'Error registering account: ' + errorText;
+                    messageDiv.style.color = 'red';
+                }
+            } catch (error) {
+                document.getElementById('message').innerHTML = 'Error: ' + error.message;
+                document.getElementById('message').style.color = 'red';
+            } finally {
+                if (typeof turnstile !== 'undefined') {
+                    turnstile.reset();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

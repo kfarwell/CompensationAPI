@@ -83,6 +83,23 @@ app.get("/", async (req, res) => {
     return res.status(200).send("Pong!");
 });
 
+//Account registration
+app.get("/register", (req, res) => {
+    const fs = require('fs');
+    const path = require('path');
+    
+    fs.readFile(path.join(__dirname, 'register.html'), 'utf8', (err, html) => {
+        if (err) {
+            return res.status(500).send('Error loading registration form');
+        }
+        
+        const siteKey = process.env.TURNSTILE_SITE_KEY || '';
+        html = html.replace('TURNSTILE_SITE_KEY', siteKey);
+        
+        res.send(html);
+    });
+});
+
 
 app.get("/api/versioncheck/:platform/:version_id", async (req, res) => {
     let {platform, version_id} = req.params;
