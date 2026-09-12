@@ -13,5 +13,6 @@
     "ratelimit_registration_window": 86400000,
     "ratelimit_registration_max": 5,
     "debug_log_requests": true,
-    "debug_trace_instances": true
+    "debug_trace_instances": true,
+    "evil_insecure_room_auth_bypass": false
 }
