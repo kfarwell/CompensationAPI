@@ -53,9 +53,12 @@ router.post("/accounts/:id/inventory-item", middleware.authenticateDeveloperToke
 });
 
 router.post("/pull-origin", async (req, res) => {
+    let key = config.debug.webhook_git_pull_secret;
+
+    if(typeof key != 'string' || key.length < 1) return res.sendStatus(404);
+
     try {
         let Authentication = req.headers.authorization.split(' ')[1];
-        let key = config.debug.webhook_git_pull_secret;
 
         if(Authentication?.length != key?.length || Authentication != key) return res.status(403).json({
             code: "invalid_secret",
