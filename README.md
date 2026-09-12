@@ -10,21 +10,16 @@ Best of luck, and we hope you enjoy Compensation Social!
 * MongoDB server
 * Firebase web app, bucket, service account, and user account
 * Photon Cloud Voice and Realtime apps
+* Optional: Twilio (2FA), Cloudflare Turnstile (captcha),
+  [ExceptionRetrievalServer](https://github.com/SubsurfaceStudios/ExceptionRetrievalServer)
 
 # Setup
 * `git clone https://github.com/kfarwell/CompensationAPI`
 * `cd CompensationAPI`
 * `git submodule update --init`
 * `npm install`
-* Copy config.json.example to config.json. Fill in your API URL, Firebase bucket URL, and Photon Cloud App IDs.
-* Copy .env.example to .env. Fill in your MongoDB info, Firebase user credentials, and generate secrets.
-* Copy env.js.example to env.js. Fill in your Firebase web app config.
-* Put your Firebase service account key in admin.json.
+* Copy example.config.jsonc to config.jsonc and fill it in.
 * `npm start`
-
-# Optional (TODO: document)
-* Twilio 2FA
-* [ExceptionRetrievalServer](https://github.com/SubsurfaceStudios/ExceptionRetrievalServer)
 
 # Website
 [compensation.subsurface.dev](https://compensation.subsurface.dev)
