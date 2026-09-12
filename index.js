@@ -33,9 +33,72 @@ app.use(fileUpload({
 
 const config = require('./config.json');
 
+const SENSITIVE_HEADERS = [
+    "authorization",
+    "proxy-authorization",
+    "cookie",
+    "set-cookie",
+    "x-api-key"
+];
+const SENSITIVE_BODY_FIELDS = [
+    "password",
+    "current_password",
+    "new_password",
+    "hashed_password",
+    "two_factor_code",
+    "code",
+    "token",
+    "access_token",
+    "accesstoken",
+    "refresh_token",
+    "refreshtoken",
+    "secret",
+    "cf-turnstile-response"
+];
+const MAX_LOGGED_REQUEST_LENGTH = 4096;
+
+function redactSensitive(value, sensitiveKeys, depth = 0) {
+    if (depth > 6 || value === null || typeof value != 'object') return value;
+    if (Array.isArray(value)) return value.map(entry => redactSensitive(entry, sensitiveKeys, depth + 1));
+
+    const redacted = {};
+    for (const [key, entry] of Object.entries(value)) {
+        redacted[key] = sensitiveKeys.includes(key.toLowerCase())
+            ? "[REDACTED]"
+            : redactSensitive(entry, sensitiveKeys, depth + 1);
+    }
+    return redacted;
+}
+
+function redactBody(body) {
+    if (Buffer.isBuffer(body)) return `[binary, ${body.length} bytes]`;
+    if (typeof body == 'string') {
+        return body.length > MAX_LOGGED_REQUEST_LENGTH
+            ? `[${body.length} characters, not logged]`
+            : body;
+    }
+    return redactSensitive(body, SENSITIVE_BODY_FIELDS);
+}
+
 app.use((req, res, next) => {
     if (config.debug_log_requests) {
-        helpers.auditLog(`HTTP ${req.method} ${req.originalUrl}\n`, false);
+        try {
+            const logData = {
+                method: req.method,
+                url: req.originalUrl,
+                headers: redactSensitive(req.headers, SENSITIVE_HEADERS),
+                body: redactBody(req.body)
+            };
+
+            let serialized = JSON.stringify(logData, null, 2);
+            if (serialized.length > MAX_LOGGED_REQUEST_LENGTH) {
+                serialized = `${serialized.slice(0, MAX_LOGGED_REQUEST_LENGTH)}\n... [truncated]`;
+            }
+
+            helpers.auditLog(`HTTP Request:\n${serialized}\n`, false);
+        } catch (ex) {
+            helpers.auditLog(`HTTP ${req.method} ${req.originalUrl} (request logging failed: ${ex.message})\n`, false);
+        }
     }
     next();
 });
