@@ -30,6 +30,9 @@
     "uuid": "^9.0.0",
     "ws": "^8.13.0"
   },
+  "overrides": {
+    "qs": "^6.16.0"
+  },
   "devDependencies": {
     "eslint": "^8.40.0"
   }
